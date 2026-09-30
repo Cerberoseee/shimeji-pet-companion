@@ -27,7 +27,6 @@ func (s *ShimejiService) AskOllama(prompt string) (*OllamaResponse, error) {
 		Character: s.cfg.Pet.Character,
 		UserEvent: prompt,
 	})
-	println("Built Prompt:", builtPrompt)
 	if err != nil {
 		return nil, fmt.Errorf("prompt build error: %w", err)
 	}

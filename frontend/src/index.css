@@ -10,6 +10,9 @@ html, body, #root {
   overflow: hidden;
   background: transparent !important;
   background-color: rgba(0, 0, 0, 0) !important;
+  user-select: none;
+  -webkit-user-select: none;
+
   /* Disable Wails window dragging */
   --wails-draggable: none !important;
   -webkit-app-region: no-drag !important;

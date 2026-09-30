@@ -4,8 +4,8 @@ ollama:
   stream: false
 
 pet:
-  name: "Ouro Kronii"
-  character: "tsundere vtuber from hololive"
+  name: "<placeholder>"
+  character: "tsundere"
 
 window:
   start_click_through: true

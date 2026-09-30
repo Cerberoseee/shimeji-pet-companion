@@ -1,16 +1,8 @@
 package shimeji
 
 import (
-	"syscall"
-
 	config "shimeji-pet-companion/internal/config"
 	physics "shimeji-pet-companion/internal/physics"
-)
-
-var (
-	user32               = syscall.NewLazyDLL("user32.dll")
-	procGetWindowLongPtr = user32.NewProc("GetWindowLongPtrW")
-	procSetWindowLongPtr = user32.NewProc("SetWindowLongPtrW")
 )
 
 type ShimejiService struct {

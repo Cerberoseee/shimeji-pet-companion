@@ -3,15 +3,20 @@ package main
 import (
 	"embed"
 	"log"
+	"os"
+	"runtime"
+	"sync"
 	"time"
 
 	"github.com/wailsapp/wails/v3/pkg/application"
+	"github.com/wailsapp/wails/v3/pkg/events"
 
-	shimeji "shimeji-pet-companion/internal/shimeji"
 	config "shimeji-pet-companion/internal/config"
 	physics "shimeji-pet-companion/internal/physics"
+	shimeji "shimeji-pet-companion/internal/shimeji"
 )
 
+//go:embed all:frontend/dist
 var assets embed.FS
 
 func init() {
@@ -19,7 +24,12 @@ func init() {
 }
 
 func main() {
-	cfg := config.LoadConfig("config.yml")
+	var cfg *config.Config
+	if _, err := os.Stat("config.local.yml"); err == nil {
+		cfg = config.LoadConfig("config.local.yml")
+	} else {
+		cfg = config.LoadConfig("config.yml")
+	}
 
 	shimejiService := shimeji.NewShimejiService(cfg, nil)
 
@@ -53,17 +63,12 @@ func main() {
 			DisableFramelessWindowDecorations: true,
 			NonClientRegionSupport:            true,
 		},
+		Mac: application.MacWindow{
+			DisableShadow: true,
+			Backdrop:      application.MacBackdropTransparent,
+		},
 	})
-	primaryScreen := app.Screen.GetPrimary()
-	screenW, screenH := 1920, 1080
 
-	if primaryScreen != nil {
-		screenW, screenH = primaryScreen.Size.Width, primaryScreen.Size.Height
-		window.SetPosition(
-			primaryScreen.Size.Width-width-20,
-			primaryScreen.Size.Height-height-20,
-		)
-	}
 	shimeji.SetupTray(app, window)
 
 	phyConfig := &physics.Config{
@@ -75,10 +80,30 @@ func main() {
 		FloorOffset:   48,
 	}
 
-	// Initialize physics engine
-	engine := physics.NewEngine(app, window, screenW, screenH, width, height, phyConfig)
-	shimejiService.SetPhysics(engine)
-	engine.Start()
+	app.Event.OnApplicationEvent(events.Common.ApplicationStarted, func(_ *application.ApplicationEvent) {
+		window.SetBackgroundColour(application.NewRGBA(0, 0, 0, 0))
+	})
+
+	var startPhysics sync.Once
+	window.OnWindowEvent(events.Common.WindowRuntimeReady, func(_ *application.WindowEvent) {
+		startPhysics.Do(func() {
+			screenW, screenH := 1920, 1080
+			if primaryScreen := app.Screen.GetPrimary(); primaryScreen != nil {
+				screenW = primaryScreen.Size.Width
+				if runtime.GOOS == "darwin" {
+					screenH = primaryScreen.Size.Height - 30
+				} else {
+					screenH = primaryScreen.Size.Height
+				}
+			} else {
+				log.Printf("primary screen unavailable after window runtime initialization; using %dx%d fallback", screenW, screenH)
+			}
+
+			engine := physics.NewEngine(app, window, screenW, screenH, width, height, phyConfig)
+			shimejiService.SetPhysics(engine)
+			engine.Start()
+		})
+	})
 
 	go func() {
 		for {

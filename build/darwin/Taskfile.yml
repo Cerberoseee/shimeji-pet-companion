@@ -6,6 +6,7 @@ includes:
 vars:
   # Docker image for cross-compilation (used when building on non-macOS)
   CROSS_IMAGE: wails-cross
+  EXTRA_TAGS: '{{.EXTRA_TAGS | default "private_mac_apis"}}'
 
 tasks:
   build:

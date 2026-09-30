@@ -2,27 +2,14 @@ package physics
 
 import (
 	"math"
-	"sync"
-	"syscall"
-	"time"
 	"math/rand"
+	"sync"
+	"time"
 
 	behavior "shimeji-pet-companion/internal/behavior"
 
 	"github.com/wailsapp/wails/v3/pkg/application"
 )
-
-var (
-	user32              = syscall.NewLazyDLL("user32.dll")
-	procGetAsyncKeyState = user32.NewProc("GetAsyncKeyState")
-)
-
-const VK_LBUTTON = 0x01
-
-func isLButtonPressed() bool {
-	val, _, _ := procGetAsyncKeyState.Call(uintptr(VK_LBUTTON))
-	return (val & 0x8000) != 0
-}
 
 type Config struct {
 	TargetFPS     int     // Change this to whatever FPS you want (e.g., 15, 30, 60)

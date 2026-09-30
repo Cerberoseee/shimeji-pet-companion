@@ -1,0 +1,11 @@
+ollama:
+  endpoint: "http://127.0.0.1:11434"
+  model: "hf.co/DreamFast/Qwen3-VL-4b-Heretic-GGUF:Q4_K_M"
+  stream: false
+
+pet:
+  name: "Ouro Kronii"
+  character: "tsundere vtuber from hololive"
+
+window:
+  start_click_through: true
